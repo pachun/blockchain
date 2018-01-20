@@ -31,6 +31,14 @@ def next_block(parent:, stuff:)
   )
 end
 
+def new_transaction
+  {
+    from: RandomWord.adjs.next,
+    to: RandomWord.nouns.next,
+    amount: rand(1..10),
+  }
+end
+
 genesis = Block.new(
   position: 0,
   stuff: "genesis",
@@ -42,7 +50,7 @@ blockchain = [genesis]
 5.times do |position|
   blockchain << next_block(
     parent: blockchain.last,
-    stuff: RandomWord.adjs.next,
+    stuff: new_transaction,
   )
 end
 
