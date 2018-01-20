@@ -1,3 +1,4 @@
+require 'sinatra'
 require 'digest'
 require 'random-word'
 
@@ -31,11 +32,11 @@ def next_block(parent:, stuff:)
   )
 end
 
-def new_transaction
+def new_transaction(from, to, amount)
   {
-    from: RandomWord.adjs.next,
-    to: RandomWord.nouns.next,
-    amount: rand(1..10),
+    from: from,# RandomWord.adjs.next,
+    to: to,# RandomWord.nouns.next,
+    amount: amount, # rand(1..10),
   }
 end
 
@@ -47,16 +48,17 @@ genesis = Block.new(
 
 blockchain = [genesis]
 
-5.times do |position|
-  blockchain << next_block(
-    parent: blockchain.last,
-    stuff: new_transaction,
+observed_transactions = []
+
+# create transaction
+post "/transaction" do
+  transaction_json = JSON.parse(request.body.read)
+  observed_transactions << new_transaction(
+    transaction_json["from"],
+    transaction_json["to"],
+    transaction_json["amount"],
   )
+  observed_transactions.to_s
 end
 
-puts "BLOCKCHAIN"
-puts "=========="
-blockchain.each do |block|
-  puts "#{block.stuff} (block id: #{block.id})"
-end
-puts "\n"
+
