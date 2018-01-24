@@ -2,6 +2,8 @@ require 'digest'
 require 'random-word'
 
 class Block
+  attr_accessor :proof_of_work
+
   def initialize(index:, stuff:, parent_id:)
     @index     = index
     @time      = Time.new
@@ -14,10 +16,10 @@ class Block
     "Block #{@index} (#{@id}): #{@stuff}"
   end
 
-  def next(next_stuff)
+  def next(stuff:)
     Block.new(
       index: @index + 1,
-      stuff: next_stuff,
+      stuff: stuff,
       parent_id: @id,
     )
   end
@@ -36,13 +38,3 @@ class Block
     Digest::SHA1.hexdigest("#{@index}#{@time}#{@stuff}#{@parent_id}")
   end
 end
-
-blockchain = [Block.genesis]
-
-4.times do |number|
-  blockchain << blockchain.last.next("#{RandomWord.adjs.next}")
-end
-
-puts
-puts blockchain
-puts
